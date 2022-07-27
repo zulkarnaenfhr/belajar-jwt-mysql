@@ -1,0 +1,29 @@
+GET http://localhost:5000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsIm5hbWUiOiJtYW1hbiIsImVtYWlsIjoibWFtYW4iLCJpYXQiOjE2NTgyNzkwMzMsImV4cCI6MTY1ODI3OTA1M30.gYmnTX630fCrLlfKLlp0E2Pu-TxCuSsSRrvwPsQrjck
+
+### 
+POST http://localhost:5000/users
+Content-Type: application/json
+
+{
+    "name": "maman",
+    "email": "maman",
+    "password": "maman",
+    "confirmPassword": "maman"
+}
+
+###
+POST http://localhost:5000/login
+Content-Type: application/json
+
+{
+    "email": "maman",
+    "password": "maman"
+}
+
+###
+GET http://localhost:5000/token
+
+
+###
+DELETE http://localhost:5000/logout
