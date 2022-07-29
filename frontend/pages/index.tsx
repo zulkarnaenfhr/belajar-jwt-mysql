@@ -1,8 +1,72 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import "bootstrap/dist/css/bootstrap.min.css";
+import jwt_decoded from "jwt-decode";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useRouter } from "next/router";
 
 const Home: NextPage = () => {
+    const [name, setName] = useState("");
+    const [token, setToken] = useState("");
+    const [expire, setExpire] = useState("");
+    const router = useRouter();
+
+    useEffect(() => {
+        refreshToken();
+    }, []);
+
+    const refreshToken = async () => {
+        try {
+            const response = await axios.get("http://localhost:5000/token", {
+                withCredentials: true,
+            });
+            setToken(response.data.accessToken);
+            const decoded = jwt_decoded(response.data.accessToken);
+            setName(decoded.name);
+            setExpire(decoded.exp);
+        } catch (error) {
+            if (error.response) {
+                router.push("/");
+            }
+        }
+    };
+
+    const axiosJWT = axios.create();
+
+    axiosJWT.interceptors.request.use(
+        async (config) => {
+            const currentDate = new Date();
+            if (expire * 1000 < currentDate.getTime()) {
+                const response = await axios.get("http://localhost:5000/token", {
+                    withCredentials: true,
+                });
+                config.headers.Authorization = `Bearer ${response.data.accessToken}`;
+                setToken(response.data.accessToken);
+                const decoded = jwt_decoded(response.data.accessToken);
+                setName(decoded.name);
+                setExpire(decoded.exp);
+            }
+            return config;
+        },
+        (error) => {
+            return Promise.reject(error);
+        }
+    );
+
+    const getAllUsers = async () => {
+        try {
+            const response = await axiosJWT.get("http://localhost:5000/users", {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+            console.log(response);
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     return (
         <div>
             <Head>
@@ -11,7 +75,15 @@ const Home: NextPage = () => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <div>
-                <h1>masuk</h1>
+                <h1>maasasdsuk</h1>
+                <h1>nama saya {name}</h1>
+                <button
+                    onClick={() => {
+                        getAllUsers();
+                    }}
+                >
+                    Get All Users
+                </button>
             </div>
         </div>
     );
